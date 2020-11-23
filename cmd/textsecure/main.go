@@ -339,7 +339,7 @@ func RekeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "DELETE" {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false}")
+		sendJsonError(w, "internal server error")
 		return
 	}
 
@@ -350,14 +350,14 @@ func RekeyHandler(w http.ResponseWriter, r *http.Request) {
 		err := os.Remove(strings.Join(filename, "_"))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "{\"success\": false, \"error\": \"identity %s not found\"}", identity)
+			sendJsonError(w, "identity %s not found", identity)
 			return
 		}
-		fmt.Fprintf(w, "{\"success\": true}")
+		sendJsonSuccess(w)
 		return
 	}
 	w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprintf(w, "{\"success\": false}")
+	sendJsonError(w, "internal server error")
 	return
 }
 
@@ -392,6 +392,27 @@ func GatewaySend(to string, message string, filename string) (bool, string) {
 	return true, "OK"
 }
 
+func sendJsonError(w http.ResponseWriter, message string, args ...interface{}) {
+	e := make(map[string]interface{})
+	e["success"] = false
+	e["error"] = fmt.Sprintf(message, args...)
+	reply, err := json.Marshal(e)
+	if nil != err {
+		log.Fatalf("sendJsonError: error: %s", err)
+	}
+	fmt.Fprintf(w, "%s", reply)
+}
+
+func sendJsonSuccess(w http.ResponseWriter) {
+	e := make(map[string]interface{})
+	e["success"] = true
+	reply, err := json.Marshal(e)
+	if nil != err {
+		log.Fatalf("sendJsonSuccess: error: %s", err)
+	}
+	fmt.Fprintf(w, "%s", reply)
+}
+
 // JSONHandler to receive POST json request, process and send
 func JSONHandler(w http.ResponseWriter, r *http.Request) {
 	messageField := os.Getenv("JSON_MESSAGE")
@@ -402,7 +423,7 @@ func JSONHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("Error: ", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false}")
+		sendJsonError(w, "internal server error")
 		return
 	}
 	var data map[string]interface{}
@@ -410,14 +431,14 @@ func JSONHandler(w http.ResponseWriter, r *http.Request) {
 	if result != nil {
 		log.Error("Error: ", result.Error())
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false}")
+		sendJsonError(w, "internal server error")
 		return
 	}
 	message := data[messageField]
 	if message == nil {
 		log.Error("Error: json request contains empty item ", messageField)
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false, \"error\": \"json request contains empty item %s\"}", messageField)
+		sendJsonError(w, "json request contains empty item %s", messageField)
 		return
 	}
 	to := r.URL.Path[len("/json/"):]
@@ -425,11 +446,11 @@ func JSONHandler(w http.ResponseWriter, r *http.Request) {
 	if sendError == false {
 		log.Error("Error: ", errormessage)
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false, \"error\": \"%s\"}", errormessage)
+		sendJsonError(w, "error: %s", errormessage)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "{\"success\": true}")
+	sendJsonSuccess(w)
 	return
 }
 
@@ -443,7 +464,7 @@ func GatewayHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		log.Error("Error: requires POST request")
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"success\": false}")
+		sendJsonError(w, "internal server error")
 		return
 	}
 
@@ -473,16 +494,16 @@ func GatewayHandler(w http.ResponseWriter, r *http.Request) {
 		if sendError == false {
 			log.Error("Error: ", errormessage)
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "{\"success\": false, \"error\": \"%s\"}", errormessage)
+			sendJsonError(w, "error: %s", errormessage)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "{\"success\": true}")
+		sendJsonSuccess(w)
 		return
 	}
 	log.Error("Error: form fields message and to are required")
 	w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprintf(w, "{\"success\": false, \"error\": \"form fields message and to are required\"}")
+	sendJsonError(w, `form fields "message" and "to" are required`)
 	return
 }
 
