@@ -16,14 +16,12 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/go-redis/redis"
 	"github.com/signal-golang/textsecure"
 	"github.com/signal-golang/textsecure/axolotl"
-	"golang.org/x/crypto/ssh/terminal"
-
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/ssh/terminal"
+	"gopkg.in/yaml.v2"
 )
 
 // Simple command line test app for TextSecure.
@@ -82,15 +80,21 @@ func init() {
 }
 
 var (
-	red    = "\x1b[31m"
-	green  = "\x1b[32m"
-	yellow = "\x1b[33m"
-	blue   = "\x1b[34m"
+	black   = "\x1b[30m"
+	red     = "\x1b[1;31m"
+	green   = "\x1b[1;32m"
+	yellow  = "\x1b[1;33m"
+	blue    = "\x1b[1;34m"
+	magenta = "\x1b[1;35m"
+	cyan    = "\x1b[1;36m"
+	white   = "\x1b[1;37m"
+	normal  = "\x1b[0m"
 )
 
 type RedisMessage struct {
-	To   string
-	Body string
+	To      string `json:"to"`
+	From    string `json:"from"`
+	Message string `json:"message"`
 }
 
 func readLine(prompt string) string {
@@ -104,11 +108,11 @@ func readLine(prompt string) string {
 }
 
 func getVerificationCode() string {
-	return readLine("Enter verification code>")
+	return readLine("Enter verification code: ")
 }
 
 func getStoragePassword() string {
-	fmt.Printf("Input storage password>")
+	fmt.Printf("Input storage password: ")
 	password, err := terminal.ReadPassword(0)
 	if err != nil {
 		log.Fatal(err)
@@ -170,9 +174,9 @@ func conversationLoop(isGroup bool) {
 	for {
 		var message string
 		if raw {
-			message = readLine(fmt.Sprintf(""))
+			message = readLine(fmt.Sprintf("\r> "))
 		} else {
-			message = readLine(fmt.Sprintf("%s>", blue))
+			message = readLine(fmt.Sprintf("\r%s> ", blue))
 		}
 		if message == "" {
 			continue
@@ -204,14 +208,13 @@ func messageHandler(msg *textsecure.Message) {
 	}
 
 	if msg.Message() != "" {
-		fmt.Printf("\r%s\n>", pretty(msg))
 		if hook != "" {
 			hookProcess := exec.Command(hook, pretty(msg))
 			hookProcess.Start()
 			hookProcess.Wait()
 		}
 		if !raw {
-			fmt.Printf("\r%s\n>", pretty(msg))
+			fmt.Printf("\r%s\n> ", pretty(msg))
 		}
 	}
 
@@ -267,7 +270,7 @@ func pretty(msg *textsecure.Message) string {
 	if raw {
 		return fmt.Sprintf("%s %s %s", timestamp(msg), src, msg.Message())
 	}
-	return fmt.Sprintf("%s %s %s", timestamp(msg), src, msg.Message())
+	return fmt.Sprintf("%s%s %s%s %s%s%s", green, timestamp(msg), yellow, src, cyan, msg.Message(), blue)
 }
 
 // getName returns the local contact name corresponding to a phone number,
