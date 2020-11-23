@@ -18,8 +18,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/signal-golang/textsecure/axolotl"
-	"github.com/signal-golang/textsecure/protobuf"
-
+	signalservice "github.com/signal-golang/textsecure/protobuf"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -591,7 +590,7 @@ func createMessage(msg *outgoingMessage) *signalservice.DataMessage {
 }
 
 func padMessage(msg []byte) []byte {
-	l := (len(msg) + 160)
+	l := len(msg) + 160
 	l = l - l%160
 	n := make([]byte, l)
 	copy(n, msg)

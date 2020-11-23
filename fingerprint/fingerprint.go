@@ -6,14 +6,12 @@ import (
 	"bytes"
 	"crypto/sha512"
 	"encoding/binary"
-
 	"fmt"
 	"hash"
 	"sort"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/signal-golang/textsecure/axolotl"
+	log "github.com/sirupsen/logrus"
 )
 
 const ITERATIONS int = 5200

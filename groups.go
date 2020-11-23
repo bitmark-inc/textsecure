@@ -14,9 +14,8 @@ import (
 	"strings"
 	"time"
 
+	signalservice "github.com/signal-golang/textsecure/protobuf"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/signal-golang/textsecure/protobuf"
 	"gopkg.in/yaml.v2"
 )
 

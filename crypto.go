@@ -16,9 +16,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/signal-golang/textsecure/axolotl"
-	"github.com/signal-golang/textsecure/protobuf"
 	"github.com/golang/protobuf/proto"
+	"github.com/signal-golang/textsecure/axolotl"
+	signalservice "github.com/signal-golang/textsecure/protobuf"
 	"golang.org/x/crypto/curve25519"
 )
 

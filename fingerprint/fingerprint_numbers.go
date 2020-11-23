@@ -44,10 +44,10 @@ func getEncodedChunk(hash []byte, offset int) string {
 
 //https://github.com/signalapp/libsignal-protocol-java/blob/4f5e1ff299cea22cc75bb97249020a7da67b816d/java/src/main/java/org/whispersystems/libsignal/util/ByteUtil.java#L225
 func byteArray5ToLong(bytes []byte, offset int) uint64 {
-	a := (uint64(bytes[offset]&0xff) << 32) |
-		(uint64(bytes[offset+1]&0xff) << 24) |
-		(uint64(bytes[offset+2]&0xff) << 16) |
-		(uint64(bytes[offset+3]&0xff) << 8) |
+	a := uint64(bytes[offset]&0xff)<<32 |
+		uint64(bytes[offset+1]&0xff)<<24 |
+		uint64(bytes[offset+2]&0xff)<<16 |
+		uint64(bytes[offset+3]&0xff)<<8 |
 		uint64(bytes[offset+4]&0xff)
 	return a
 }

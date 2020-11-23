@@ -11,8 +11,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
-	"github.com/signal-golang/textsecure/protobuf"
-
+	signalservice "github.com/signal-golang/textsecure/protobuf"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,7 +23,7 @@ const (
 	pongWait = 60 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
+	pingPeriod = pongWait * 9 / 10
 
 	// Signal websocket endpoint
 	websocketPath = "/v1/websocket/"

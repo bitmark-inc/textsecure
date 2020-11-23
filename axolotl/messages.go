@@ -7,9 +7,8 @@ import (
 	"crypto/hmac"
 	"errors"
 
-	protobuf "github.com/signal-golang/textsecure/axolotl/protobuf"
-
 	"github.com/golang/protobuf/proto"
+	protobuf "github.com/signal-golang/textsecure/axolotl/protobuf"
 )
 
 // WhisperMessage represents the encrypted message format used in TextSecure.
@@ -27,11 +26,11 @@ const macLength = 8
 const currentVersion = 3
 
 func highBitsToInt(b byte) byte {
-	return (b & 0xF0) >> 4
+	return b & 0xF0 >> 4
 }
 
 func makeVersionByte(hi, lo byte) byte {
-	return (hi << 4) | lo
+	return hi<<4 | lo
 }
 
 // ErrIncompleteWhisperMessage is returned when an incomplete WhisperMessage is received.

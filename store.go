@@ -17,9 +17,8 @@ import (
 
 	"github.com/signal-golang/textsecure/axolotl"
 	"github.com/signal-golang/textsecure/fingerprint"
-	"golang.org/x/crypto/pbkdf2"
-
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 // store implements the PreKeyStore, SignedPreKeyStore,
@@ -263,12 +262,12 @@ func GetFingerprint(remoteIdentifier string) ([]string, []byte, error) {
 
 	remoteIdentityKey, err := ContactIdentityKey(remoteIdentifier)
 	if err != nil {
-		return nil, nil,  err
+		return nil, nil, err
 	}
 
 	numericFingerprint, scannableFingerprint, err := fingerprint.CreateFingerprintSimple(1, localIdentifier, localIdentityKey, remoteIdentifier, remoteIdentityKey)
 	if err != nil {
-		return nil, nil,  err
+		return nil, nil, err
 	}
 	return numericFingerprint, scannableFingerprint, nil
 }

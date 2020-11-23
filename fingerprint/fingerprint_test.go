@@ -29,7 +29,7 @@ func TestCreateFingerprintSimple_alice(t *testing.T) {
 
 	result, _, err := CreateFingerprintSimple(1, ALICE_TEL, ALICE_KEY, BOB_TEL, BOB_KEY)
 
-    assert.Nil(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, FINGERPRINT, result)
 }
 

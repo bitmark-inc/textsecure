@@ -2,9 +2,10 @@ package fingerprint
 
 import (
 	proto "github.com/golang/protobuf/proto"
-	"github.com/signal-golang/textsecure/axolotl/protobuf"
+	textsecure "github.com/signal-golang/textsecure/axolotl/protobuf"
 	"golang.org/x/text/encoding/charmap"
 )
+
 //based on https://github.com/signalapp/libsignal-protocol-java/blob/3662b6d705ae4162ad8b3a242daf35171edbb068/java/src/main/java/org/whispersystems/libsignal/fingerprint/ScannableFingerprint.java
 //and https://github.com/signalapp/Signal-Android/blob/6f39f9849a002f6361d192a00fbd7c52ffaf3bba/app/src/main/java/org/thoughtcrime/securesms/VerifyIdentityActivity.java#
 func CreateQRFingerprint(version uint32, localFingerprint []byte, remoteFingerprint []byte) ([]byte, error) {
@@ -36,7 +37,7 @@ func getMarshalledCombinedFingerprints(version uint32, localFingerprint []byte, 
 			Content: remoteFingerprint[:32],
 		},
 	}
-    //https://github.com/signalapp/libsignal-protocol-java/blob/3662b6d705ae4162ad8b3a242daf35171edbb068/java/src/main/java/org/whispersystems/libsignal/fingerprint/ScannableFingerprint.java#L43
+	//https://github.com/signalapp/libsignal-protocol-java/blob/3662b6d705ae4162ad8b3a242daf35171edbb068/java/src/main/java/org/whispersystems/libsignal/fingerprint/ScannableFingerprint.java#L43
 	data, err := proto.Marshal(combinedFingerprints)
 	if err != nil {
 		return nil, err
