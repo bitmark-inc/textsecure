@@ -5,6 +5,7 @@
 package textsecure
 
 import (
+	"bytes"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -12,14 +13,10 @@ import (
 	"os"
 	"strings"
 
-	"bytes"
-
-	"github.com/signal-golang/mimemagic"
-
 	"github.com/golang/protobuf/proto"
-
+	"github.com/signal-golang/mimemagic"
 	"github.com/signal-golang/textsecure/axolotl"
-	"github.com/signal-golang/textsecure/protobuf"
+	signalservice "github.com/signal-golang/textsecure/protobuf"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -378,6 +375,10 @@ func Setup(c *Client) error {
 	return err
 }
 
+func CurrentPhoneNumber() string {
+	return config.Tel
+}
+
 func registerDevice() error {
 	if config.Tel == "" {
 		config.Tel = client.GetPhoneNumber()
@@ -437,7 +438,10 @@ func handleReceipt(env *signalservice.Envelope) {
 }
 
 func recID(source string) string {
-	return source[1:]
+	if '+' == source[0] {
+		return source[1:]
+	}
+	return source
 }
 
 func handleMessage(src string, timestamp uint64, b []byte) error {
