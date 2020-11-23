@@ -223,20 +223,27 @@ func messageHandler(msg *textsecure.Message) {
 	}
 
 	// if no peer was specified on the command line, start a conversation with the first one contacting us
-	if to == "" {
+	if to == "" && !redismode {
 		to = msg.Source()
 		isGroup := false
 		if msg.Group() != nil {
 			isGroup = true
 			to = msg.Group().Hexid
 		}
-		if !redismode {
-			go conversationLoop(isGroup)
-		}
+		go conversationLoop(isGroup)
 	}
 	if redismode {
-		log.Infof("Publishing to redis, To: %s, Msg: %s", to, msg.Message())
-		rmsg := RedisMessage{to, msg.Message()}
+		from := msg.Source()
+		if nil != msg.Group() {
+			from = msg.Group().Hexid
+		}
+		msg := msg.Message()
+		log.Infof("Publishing to redis, From: %s, Msg: %s", from, msg)
+		rmsg := RedisMessage{
+			To:      textsecure.CurrentPhoneNumber(), // my local number
+			From:    from,                            // peer's number
+			Message: msg,                             // message from peer
+		}
 		sendMessageToRedis(rmsg)
 	}
 }
