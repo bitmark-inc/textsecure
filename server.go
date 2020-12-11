@@ -794,40 +794,31 @@ func sendMessage(msg *outgoingMessage) (uint64, error) {
 		deviceLists[msg.tel] = []uint32{1}
 	}
 
-	dm := createMessage(msg)
-
-	content := &signalservice.Content{
-		DataMessage: dm,
-	}
-	b, err := proto.Marshal(content)
+	now := uint64(time.Now().UnixNano() / 1000000)
+	resp, err := buildAndSendMessage(msg.tel, padMessage([]byte(msg.msg)), false, &now)
 	if err != nil {
 		return 0, err
 	}
 
-	resp, err := buildAndSendMessage(msg.tel, padMessage(b), false, dm.Timestamp)
-	if err != nil {
-		return 0, err
-	}
+	// if resp.NeedsSync {
+	// 	log.Debugf("[textsecure] Needs sync. destination: %s", msg.tel)
+	// 	sm := &signalservice.SyncMessage{
+	// 		Sent: &signalservice.SyncMessage_Sent{
+	// 			DestinationE164: &msg.tel,
+	// 			Timestamp:       dm.Timestamp,
+	// 			Message:         dm,
+	// 		},
+	// 	}
 
-	if resp.NeedsSync {
-		log.Debugf("[textsecure] Needs sync. destination: %s", msg.tel)
-		sm := &signalservice.SyncMessage{
-			Sent: &signalservice.SyncMessage_Sent{
-				DestinationE164: &msg.tel,
-				Timestamp:       dm.Timestamp,
-				Message:         dm,
-			},
-		}
-
-		_, serr := sendSyncMessage(sm, dm.Timestamp)
-		if serr != nil {
-			log.WithFields(log.Fields{
-				"error":       serr,
-				"destination": msg.tel,
-				"timestamp":   resp.Timestamp,
-			}).Error("Failed to send sync message")
-		}
-	}
+	// 	_, serr := sendSyncMessage(sm, dm.Timestamp)
+	// 	if serr != nil {
+	// 		log.WithFields(log.Fields{
+	// 			"error":       serr,
+	// 			"destination": msg.tel,
+	// 			"timestamp":   resp.Timestamp,
+	// 		}).Error("Failed to send sync message")
+	// 	}
+	// }
 
 	return resp.Timestamp, err
 }
