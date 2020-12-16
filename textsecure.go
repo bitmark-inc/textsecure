@@ -626,10 +626,11 @@ func handleReceivedMessage(msg []byte) error {
 		if err != nil {
 			return err
 		}
-		err = handleMessage(env.GetSourceE164(), env.GetTimestamp(), b)
-		if err != nil {
-			return err
-		}
+
+		client.MessageHandler(&Message{
+			source:  env.GetSourceE164(),
+			message: string(stripPadding(b)),
+		})
 
 	case signalservice.Envelope_PREKEY_BUNDLE:
 		msg := env.GetContent()
@@ -653,10 +654,11 @@ func handleReceivedMessage(msg []byte) error {
 		if err != nil {
 			return err
 		}
-		err = handleMessage(env.GetSourceE164(), env.GetTimestamp(), b)
-		if err != nil {
-			return err
-		}
+
+		client.MessageHandler(&Message{
+			source:  env.GetSourceE164(),
+			message: string(stripPadding(b)),
+		})
 	default:
 		return MessageTypeNotImplementedError{uint32(*env.Type)}
 	}
