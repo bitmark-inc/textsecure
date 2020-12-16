@@ -52,6 +52,7 @@ var (
 	redisbind    string
 	redispw      string
 	redisdb      int
+	redisqueue   string
 )
 
 func init() {
@@ -77,6 +78,7 @@ func init() {
 	flag.StringVar(&redisbind, "redisbind", "redis:6379", "bind address and port for redis")
 	flag.StringVar(&redispw, "redispw", "", "redis password")
 	flag.IntVar(&redisdb, "redisdb", 0, "redis database")
+	flag.StringVar(&redisqueue, "redisqueue", "messages", "redis queue name")
 }
 
 var (
@@ -140,7 +142,7 @@ func sendMessageToRedis(rmsg RedisMessage) {
 		DB:       redisdb,
 	})
 	log.Debug("Publishing message to redis")
-	client.Publish("messages", b)
+	client.Publish(redisqueue, b)
 }
 
 func sendMessage(isGroup bool, to, message string) error {
